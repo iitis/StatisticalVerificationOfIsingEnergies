@@ -2,6 +2,7 @@ module StatisticalVerificationOfIsingEnergies
 
 using Distributions
 using Cumulants
+using StatsBase
 
 export estimate_ground_state_energy, squared_error, bootstrap_get_pvalue,
        bootstrap_hists_of_mins, estiamte_temperature
