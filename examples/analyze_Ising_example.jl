@@ -28,7 +28,7 @@ function estimate_min_pegasusu_data(ats::Vector{Int}, css::String, α::Float64, 
 
     D = Dict{String, Any}()
     push!(D, "annealing_times" => ats)
-    push!(D, "alphas" => α)
+    push!(D, "alpha" => α)
     push!(D, "true_ground" => -92.43)
 
     energies = []
