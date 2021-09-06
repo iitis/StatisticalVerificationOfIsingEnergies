@@ -8,11 +8,16 @@ using StatisticalVerificationOfIsingEnergies
 import StatisticalVerificationOfIsingEnergies: bootstrap_hists_of_mins, squared_error
 
 
-function estimate_min_pegasusu_data(α::Float64, folder::String)
+function estimate_min(α::Float64, folder::String)
 
-    D = npzread(folder*"ens_case7_wisla.npz")
+    D = npzread(folder)
 
-    ens = D["energies"]
+    ens = 0.
+    try
+        ens = transpose(D["energies01"])
+    catch
+        ens = D["energies"]
+    end
 
     S = 1_000
 
@@ -26,7 +31,13 @@ function estimate_min_pegasusu_data(α::Float64, folder::String)
     bootstrap_std = [std(y) for y in ys]
     squared_error_from_cums = [squared_error(α, ens[i,:]) for i in 1:l]
 
-    e_min = D["true_ground"]
+    e_min = 0.
+    try
+        e_min = D["true_ground"]
+    catch
+        e_min = D["ground"]
+    end
+
     betas = [estiamte_temperature(e_min, ens[i,:]) for i in 1:l]
 
     push!(D, "alpha" => α)
@@ -37,9 +48,22 @@ function estimate_min_pegasusu_data(α::Float64, folder::String)
     push!(D, "bootstrap_std" => bootstrap_std)
     push!(D, "squared_error" => squared_error_from_cums)
 
-    npzwrite("output/case7_wisla.npz", D)
+    if contains(file, "artificial")
+        outfile = "artificial_case1_wisla.npz"
+    else
+        outfile = "case7_wisla.npz"
+    end
+
+    npzwrite("output/"*outfile, D)
 end
 
 
-α = 0.19
-estimate_min_pegasusu_data(α, "input_data/trains_data/")
+s = ArgParseSettings("description")
+  @add_arg_table! s begin
+  "file"
+  arg_type = String
+  help = "file with data to be plotted"
+end
+
+file = parse_args(s)["file"]
+estimate_min(0.19, file)
