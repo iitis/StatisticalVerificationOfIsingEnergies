@@ -8,50 +8,28 @@ using StatisticalVerificationOfIsingEnergies
 import StatisticalVerificationOfIsingEnergies: bootstrap_hists_of_mins, squared_error
 
 
+function estimate_min_pegasusu_data(α::Float64, folder::String)
 
-function read_Pegasus(f::String)
-    csv_reader = CSV.File(f)
-    energies = Float64[]
+    D = npzread(folder*"ens_case7_wisla.npz")
 
-    for i in 1:length(csv_reader)
-        if csv_reader[i][:chain_break_fraction] < 0.01
-            for _ in 1:csv_reader[i][:num_occurrences]
-                push!(energies, csv_reader[i][:energy])
-            end
-        end
-    end
-    energies
-end
-
-
-function estimate_min_pegasusu_data(ats::Vector{Int}, css::String, α::Float64, folder::String)
-
-    D = Dict{String, Any}()
-    push!(D, "annealing_times" => ats)
-    push!(D, "alpha" => α)
-    push!(D, "true_ground" => -92.43)
-
-    energies = []
-
-    for i in 1:length(ats)
-        f = folder*"/Qfile_case7_wisla_20_10_1.75_1.75_at_$(ats[i])_css_"*css*".csv"
-        push!(energies, read_Pegasus(f))
-
-    end
+    ens = D["energies"]
 
     S = 1_000
 
-    min_data = [minimum(e) for e in energies]
-    min_estimated = [estimate_ground_state_energy(e, α) for e in energies]
-    p_values = [bootstrap_get_pvalue(e, α, S) for e in energies]
+    l = size(ens, 1)
 
-    ys = [bootstrap_hists_of_mins(e, α, S) for e in energies]
+    min_data = [minimum(ens[i,:]) for i in 1:l]
+    min_estimated = [estimate_ground_state_energy(ens[i,:], α) for i in 1:l]
+    p_values = [bootstrap_get_pvalue(ens[i,:], α, S) for i in 1:l]
+
+    ys = [bootstrap_hists_of_mins(ens[i,:], α, S) for i in 1:l]
     bootstrap_std = [std(y) for y in ys]
-    squared_error_from_cums = [squared_error(α, e) for e in energies]
+    squared_error_from_cums = [squared_error(α, ens[i,:]) for i in 1:l]
 
     e_min = D["true_ground"]
-    betas = [estiamte_temperature(e_min, e) for e in energies]
+    betas = [estiamte_temperature(e_min, ens[i,:]) for i in 1:l]
 
+    push!(D, "alpha" => α)
     push!(D, "minimum_from_data" => min_data)
     push!(D, "minimum_estimated" => min_estimated)
     push!(D, "p_values" => p_values)
@@ -63,6 +41,5 @@ function estimate_min_pegasusu_data(ats::Vector{Int}, css::String, α::Float64, 
 end
 
 
-ats = [20, 200, 1400]
 α = 0.19
-estimate_min_pegasusu_data(ats, "2", α, "input_data/trains_data/")
+estimate_min_pegasusu_data(α, "input_data/trains_data/")
