@@ -35,8 +35,10 @@ end
 function bootstrap_hists_of_mins(x::Vector{Float64}, α::Float64, n::Int, l::Int=length(x))
     αs = fill(α, n)
     ret = zeros(length(αs))
+    i = 1
     Threads.@threads for α ∈ αs
-        estimate_ground_state_energy(rand(x, l), α)
+        ret[i] = estimate_ground_state_energy(rand(x, l), α)
+        i = i+1
     end
     ret
 end
