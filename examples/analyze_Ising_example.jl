@@ -12,33 +12,23 @@ function estimate_min(α::Float64, folder::String)
 
     D = npzread(folder)
 
-    ens = 0.
-    try
-        ens = transpose(D["energies01"])
-    catch
-        ens = D["energies"]
-    end
+    ens = D["energies01"]
 
     S = 1_000
 
-    l = size(ens, 1)
+    l = size(ens, 2)
 
-    min_data = [minimum(ens[i,:]) for i in 1:l]
-    min_estimated = [estimate_ground_state_energy(ens[i,:], α) for i in 1:l]
-    p_values = [bootstrap_get_pvalue(ens[i,:], α, S) for i in 1:l]
+    min_data = [minimum(ens[:,i]) for i in 1:l]
+    min_estimated = [estimate_ground_state_energy(ens[:,i], α) for i in 1:l]
+    p_values = [bootstrap_get_pvalue(ens[:,i], α, S) for i in 1:l]
 
-    ys = [bootstrap_hists_of_mins(ens[i,:], α, S) for i in 1:l]
+    ys = [bootstrap_hists_of_mins(ens[:,i], α, S) for i in 1:l]
     bootstrap_std = [std(y) for y in ys]
-    squared_error_from_cums = [squared_error(α, ens[i,:]) for i in 1:l]
+    squared_error_from_cums = [squared_error(α, ens[:,i]) for i in 1:l]
 
-    e_min = 0.
-    try
-        e_min = D["true_ground"]
-    catch
-        e_min = D["ground"]
-    end
+    e_min = D["ground"]
 
-    betas = [estiamte_temperature(e_min, ens[i,:]) for i in 1:l]
+    betas = [estiamte_temperature(e_min, ens[:,i]) for i in 1:l]
 
     push!(D, "alpha" => α)
     push!(D, "minimum_from_data" => min_data)
@@ -48,13 +38,8 @@ function estimate_min(α::Float64, folder::String)
     push!(D, "bootstrap_std" => bootstrap_std)
     push!(D, "squared_error" => squared_error_from_cums)
 
-    if contains(file, "artificial")
-        outfile = "artificial_case1_wisla.npz"
-    else
-        outfile = "case7_wisla.npz"
-    end
-
-    npzwrite("output/"*outfile, D)
+    outfile = replace(file, "input_data" => "output")
+    npzwrite(outfile, D)
 end
 
 
