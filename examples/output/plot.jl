@@ -153,7 +153,7 @@ function plot_p_values(file::String)
     Z = Z .+ 1*10^-5
 
 
-    p = plot(x, Z, title = "α = $α", markershape = :circle, legend=(:topright), label = "p-value", color = "red", ylims = (10^-5,1.), yaxis=:log)
+    p = plot(x, Z, title = "α = $α", markershape = :circle, legend=(:topright), label = false, color = "red", ylims = (10^-5,1.), yaxis=:log)
 
     try
         x = D["annealing_times"]
