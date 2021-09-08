@@ -21,6 +21,51 @@ julia> estimate_ground_state_energy(x, 0.19)
 
 ```
 
+### Bootstrap series of samples of estimated minimal energies
+
+Statistics and histogram can be computed from these
+
+
+```julia
+
+bootstrap_hists_of_mins(x::Vector{Float64}, α::Float64, n::Int, l::Int=length(x))
+
+julia> x = [1. ,1.5, 2., 3., 4.];
+
+julia> h = bootstrap_hists_of_mins(x, 0.19, 10)
+10-element Vector{Float64}:
+ -30.312380622438372
+  -9.205220830116549
+  -0.143734959618822
+   0.2968807971118199
+  48.92088332046563
+  -2.429249461334908
+   5.837040780975512
+   4.3486822264117135
+   0.3245649308236207
+   0.9309299811472944
+
+julia> std(h)
+19.500184919003857
+
+```
+
+### Squared error of estimated minimal energy, for comparison with bootstrap
+
+```julia
+
+julia> squared_error(α::Float64, x::Vector{Float64})
+
+julia> x = [1. ,1.5, 2., 3., 4.];
+
+
+julia> squared_error(0.19, x)
+8.633622351519547
+
+
+```
+
+
 ### Testing energy spectrum
 
 To get the p-value, the probability that the minimal enegry can be the ground state energy (using the Boodstad resampling):
@@ -41,7 +86,8 @@ To get the p-value, the probability that the minimal enegry can be the ground st
 
 ```
 
-### estimate temperature, given a ground state energy
+
+### Estimate temperature, given a ground state energy
 
 ```julia
 
