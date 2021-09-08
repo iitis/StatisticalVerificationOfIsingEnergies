@@ -91,7 +91,7 @@ function plot_minenergy_vs_ground(file::String)
     α = D["alpha"]
     Z = ( D["minimum_from_data"] .- D["ground"])/abs(D["ground"])
 
-    plot!(p, x, Z, markershape = :circle, legend=(:topright), title = " α = $α", color = "red", label = "energy")
+    plot!(p, x, Z, markershape = :circle, legend=(:topright), title = " α = $α", color = "red", label = false)
 
     ylabel!("(minimal energy - true ground)/|true ground|")
 
