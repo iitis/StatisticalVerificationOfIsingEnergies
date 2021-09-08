@@ -75,10 +75,8 @@ julia> h = bootstrap_hists_of_mins(energies, 0.19, 3)
 function bootstrap_hists_of_mins(energies::Vector{Float64}, α::Float64, s::Int, l::Int=length(energies))
     αs = fill(α, s)
     ret = zeros(length(αs))
-    i = 1
-    Threads.@threads for α ∈ αs
+    Threads.@threads for i ∈ 1:s
         ret[i] = estimate_ground_state_energy(rand(energies, l), α)
-        i = i+1
     end
     ret
 end
