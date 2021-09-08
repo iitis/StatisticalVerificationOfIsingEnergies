@@ -47,6 +47,19 @@ To get the p-value, the probability that the minimal enegry can be the ground st
 
 estiamte_temperature(ground_energy::Float64, energies::Vector{Float64})
 
+
+julia> x = [1. ,1.5, 2., 3., 4.]
+5-element Vector{Float64}:
+ 1.0
+ 1.5
+ 2.0
+ 3.0
+ 4.0
+
+julia> estiamte_temperature(0., x)
+0.8958957699200034
+
+
 ```
 
 This project was supported by the Foundation for Polish Science (FNP) under grant number TEAM NET POIR.04.04.00-00-17C1/18-00
