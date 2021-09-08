@@ -14,9 +14,9 @@ To estimate ground state energy from data
 estimate_ground_state_energy(energies::Vector{Float64}, α::Float64)
 
 
-julia> x = [0.1, 1., 1.2, 2., 2.2, 3., 3.1, 3.5];
+julia> energies = [0.1, 1., 1.2, 2., 2.2, 3., 3.1, 3.5];
 
-julia> estimate_ground_state_energy(x, 0.19)
+julia> estimate_ground_state_energy(energies, 0.19)
 9.745023110079497
 
 ```
@@ -28,40 +28,30 @@ Statistics and histogram can be computed from these
 
 ```julia
 
-bootstrap_hists_of_mins(x::Vector{Float64}, α::Float64, n::Int, l::Int=length(x))
+bootstrap_hists_of_mins(energies::Vector{Float64}, α::Float64, s::Int, l::Int=length(x))
 
-julia> x = [1. ,1.5, 2., 3., 4.];
+julia> energies = [1. ,1.5, 2., 3., 4.];
 
-julia> h = bootstrap_hists_of_mins(x, 0.19, 10)
-10-element Vector{Float64}:
- -30.312380622438372
-  -9.205220830116549
-  -0.143734959618822
-   0.2968807971118199
-  48.92088332046563
-  -2.429249461334908
-   5.837040780975512
-   4.3486822264117135
-   0.3245649308236207
-   0.9309299811472944
+julia> Random.seed!(1234);
 
-julia> std(h)
-19.500184919003857
-
+julia> h = bootstrap_hists_of_mins(energies, 0.19, 3)
+3-element Vector{Float64}:
+ 10.327274688631618
+ -4.407048476374387
+ -4.721357273543485
 ```
 
 ### Squared error of estimated minimal energy, for comparison with bootstrap
 
 ```julia
 
-julia> squared_error(α::Float64, x::Vector{Float64})
+julia> squared_error(α::Float64, energies::Vector{Float64})
 
-julia> x = [1. ,1.5, 2., 3., 4.];
+julia> energies = [1. ,1.5, 2., 3., 4.];
 
 
-julia> squared_error(0.19, x)
+julia> squared_error(0.19, energies)
 8.633622351519547
-
 
 ```
 
@@ -75,13 +65,12 @@ To get the p-value, the probability that the minimal enegry can be the ground st
  bootstrap_get_pvalue(energies::Vector{Float64}, α::Float64, s::Int = 1_000)
 
 
-
  julia> Random.seed!(1234);
 
- julia> x = [0.1, 1., 1.2, 2., 2.2, 3., 3.1, 3.5];
+ julia> energies = [0.1, 1., 1.2, 2., 2.2, 3., 3.1, 3.5];
 
- julia> bootstrap_get_pvalue(x, 0.19)
- 0.6659999999999999
+ julia> bootstrap_get_pvalue(energies, 0.19)
+ 0.655
 
 
 ```
@@ -94,15 +83,10 @@ To get the p-value, the probability that the minimal enegry can be the ground st
 estiamte_temperature(ground_energy::Float64, energies::Vector{Float64})
 
 
-julia> x = [1. ,1.5, 2., 3., 4.]
-5-element Vector{Float64}:
- 1.0
- 1.5
- 2.0
- 3.0
- 4.0
+julia> energies = [1. ,1.5, 2., 3., 4.];
 
-julia> estiamte_temperature(0., x)
+
+julia> estiamte_temperature(0., energies)
 0.8958957699200034
 
 
