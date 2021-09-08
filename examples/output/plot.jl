@@ -60,8 +60,8 @@ function plot_bootstrad_std(file::String)
         α = D["alpha"]
 
 
-        plot!(p, x, y, label = "std from bootsrap resampling", line = (:green, 1.5), title = " α = $α", legend=(:topright))
-        plot!(p, x, y1, label = "std from error calculus", line = (:red, 1.5), title = " α = $α" , legend=(:topright))
+        plot!(p, x, y, label = "std from bootsrap resampling", line = (:green, 1.5), marker = (:dot, :green), title = " α = $α", legend=(:topright))
+        plot!(p, x, y1, label = "std from error calculus", line = (:red, 1.5), marker = (:dot, :red), title = " α = $α" , legend=(:topright))
 
         ylabel!("energy")
 
@@ -89,11 +89,11 @@ function plot_minenergy_vs_ground(file::String)
     end
 
     α = D["alpha"]
-    Z =  D["minimum_from_data"] .- D["ground"]
+    Z = ( D["minimum_from_data"] .- D["ground"])/abs(D["ground"])
 
     plot!(p, x, Z, markershape = :circle, legend=(:topright), title = " α = $α", color = "red", label = "energy")
 
-    ylabel!("minimal energy - true ground")
+    ylabel!("(minimal energy - true ground)/|true ground|")
 
     str = "_energies_vsground"
     file1 = replace(file, ".npz" => str*".pdf")
