@@ -27,11 +27,11 @@ function estimate_ground_state_energy(energies::Vector{Float64}, α::Float64)
     σ = std(energies)
     η = skewness(energies)
 
-    return μ-(α+2)/(α+1)*σ/η
+    μ-(α+2)/(α+1)*σ/η
 end
 
 """
-    squared_error(α::Float64, energies::Vector{Float64})
+    squared_error(energies::Vector{Float64}, α::Float64)
 
 Returns Float64, estimated standard deviation of the estimation of the ground state energy
 
@@ -39,11 +39,11 @@ Returns Float64, estimated standard deviation of the estimation of the ground st
 
 julia> energies = [1. ,1.5, 2., 3., 4.];
 
-julia> squared_error(0.19, energies)
+julia> squared_error(energies, 0.19)
 8.633622351519547
 ```
 """
-function squared_error(α::Float64, energies::Vector{Float64})
+function squared_error(energies::Vector{Float64}, α::Float64)
     N = length(energies)
     B = (α+2)/(α+1)
     c = [Array(x)[1] for x in cumulants(reshape(energies, :, 1), 6, 1)]
@@ -73,8 +73,7 @@ julia> h = bootstrap_hists_of_mins(energies, 0.19, 3)
 ```
 """
 function bootstrap_hists_of_mins(energies::Vector{Float64}, α::Float64, s::Int, l::Int=length(energies))
-    αs = fill(α, s)
-    ret = zeros(length(αs))
+    ret = zeros(s)
     Threads.@threads for i ∈ 1:s
         ret[i] = estimate_ground_state_energy(rand(energies, l), α)
     end
@@ -100,11 +99,11 @@ function bootstrap_get_pvalue(energies::Vector{Float64}, α::Float64, s::Int=100
     y = bootstrap_hists_of_mins(energies, α, s)
     f = ecdf(y)
     Hmin = minimum(energies)
-    1.0- f(Hmin)
+    1.0 - f(Hmin)
 end
 
 """
-    estiamte_temperature(ground_energy::Float64, energies::Vector{Float64})
+    estiamte_temperature(energies::Vector{Float64}, ground_energy::Float64)
 
 returns Float64, estimated temperature.
 
@@ -112,11 +111,11 @@ returns Float64, estimated temperature.
 ```jldoctest
 julia> energies = [1. ,1.5, 2., 3., 4.];
 
-julia> estiamte_temperature(0., energies)
+julia> estiamte_temperature(energies, 0.)
 0.8958957699200034
 ```
 """
-function estiamte_temperature(ground_energy::Float64, energies::Vector{Float64})
+function estiamte_temperature(energies::Vector{Float64}, ground_energy::Float64)
     EH = ground_energy - mean(energies)
     EH/(std(energies)*skewness(energies)*EH-var(energies))
 end

@@ -12,7 +12,7 @@ end
 
 @testset "error calculation" begin
     x = [0.1, 0.1, 0.1, 0.2, 0.2, 0.3]
-    @test squared_error(0.34, x) ≈ 0.2614025705829984
+    @test squared_error(x, 0.34) ≈ 0.2614025705829984
 end
 
 
@@ -32,6 +32,6 @@ end
 
 @testset "estimate temparature" begin
     x = [1. ,1.5, 2., 3., 4.]
-    @test estiamte_temperature(0., x) ≈ 0.8958957699200034
+    @test estiamte_temperature(x, 0.) ≈ 0.8958957699200034
 
 end
