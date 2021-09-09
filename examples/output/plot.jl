@@ -29,9 +29,7 @@ function plot_minimal_energies(file::String)
         plot!(p, x, Z, label = "minimum estimated", marker = (:dot, :black),  color = "black")
 
         plot!(p, x, D["bootstrap_q95"], color = "gray", label = "95 percentile of estimated min.", line = (:dash))
-        xlabel!("Metropolis Hastings β")
         ylabel!("minimal energy")
-
 
         str = "minimal_energies"
         file1 = replace(file, ".npz" => str*".pdf")

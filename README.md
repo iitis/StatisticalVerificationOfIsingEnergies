@@ -45,12 +45,12 @@ julia> h = bootstrap_hists_of_mins(energies, 0.19, 3)
 
 ```julia
 
-julia> squared_error(α::Float64, energies::Vector{Float64})
+julia> squared_error(energies::Vector{Float64}, α::Float64)
 
 julia> energies = [1. ,1.5, 2., 3., 4.];
 
 
-julia> squared_error(0.19, energies)
+julia> squared_error(energies, 0.19)
 8.633622351519547
 
 ```
@@ -80,13 +80,13 @@ To get the p-value, the probability that the minimal enegry can be the ground st
 
 ```julia
 
-estiamte_temperature(ground_energy::Float64, energies::Vector{Float64})
+estiamte_temperature(energies::Vector{Float64}, ground_energy::Float64)
 
 
 julia> energies = [1. ,1.5, 2., 3., 4.];
 
 
-julia> estiamte_temperature(0., energies)
+julia> estiamte_temperature(energies, 0.)
 0.8958957699200034
 
 
