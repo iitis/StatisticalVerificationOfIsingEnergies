@@ -28,6 +28,7 @@ function plot_minimal_energies(file::String)
         plot!(p, x, D["minimum_from_data"], line = (:red, 1.), marker = (:dot, :red), label = "minimum from D-Wave samples")
         plot!(p, x, Z, label = "minimum estimated", marker = (:dot, :black),  color = "black")
 
+        plot!(p, x, D["bootstrap_q95"], color = "gray", label = "95 percentile of estimated min.", line = (:dash))
         xlabel!("Metropolis Hastings β")
         ylabel!("minimal energy")
 

@@ -24,6 +24,7 @@ function estimate_min(α::Float64, folder::String)
 
     ys = [bootstrap_hists_of_mins(ens[:,i], α, S) for i in 1:l]
     bootstrap_std = [std(y) for y in ys]
+    q95 = [quantile(y, 0.95) for y in ys]
     squared_error_from_cums = [squared_error(α, ens[:,i]) for i in 1:l]
 
     e_min = D["ground"]
@@ -36,6 +37,7 @@ function estimate_min(α::Float64, folder::String)
     push!(D, "p_values" => p_values)
     push!(D, "estimated_betas" => betas)
     push!(D, "bootstrap_std" => bootstrap_std)
+    push!(D, "bootstrap_q95" => q95)
     push!(D, "squared_error" => squared_error_from_cums)
 
     outfile = replace(file, "input_data" => "output")
