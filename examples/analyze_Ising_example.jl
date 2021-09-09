@@ -25,11 +25,11 @@ function estimate_min(α::Float64, folder::String)
     ys = [bootstrap_hists_of_mins(ens[:,i], α, S) for i in 1:l]
     bootstrap_std = [std(y) for y in ys]
     q95 = [quantile(y, 0.95) for y in ys]
-    squared_error_from_cums = [squared_error(α, ens[:,i]) for i in 1:l]
+    squared_error_from_cums = [squared_error(ens[:,i], α) for i in 1:l]
 
     e_min = D["ground"]
 
-    betas = [estiamte_temperature(e_min, ens[:,i]) for i in 1:l]
+    betas = [estiamte_temperature(ens[:,i], e_min) for i in 1:l]
 
     push!(D, "alpha" => α)
     push!(D, "minimum_from_data" => min_data)
