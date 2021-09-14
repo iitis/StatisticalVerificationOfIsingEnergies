@@ -8,7 +8,7 @@ using HypothesisTests
 function plot_minimal_energies(file::String)
         D = npzread(file)
 
-        p = plot()
+        p = plot(size = (300, 200))
 
         x = 0.
         try
@@ -23,7 +23,7 @@ function plot_minimal_energies(file::String)
         α = D["alpha"]
         Z = D["minimum_estimated"]
 
-        plot!(p, x, y, label = "true ground", line = (:green, 1.5), title = " α = $α", legend=(:topright))
+        plot!(p, x, y, label = "true ground", line = (:green, 1.5), legend=false)
 
         plot!(p, x, D["minimum_from_data"], line = (:red, 1.), marker = (:dot, :red), label = "minimum from D-Wave samples")
         plot!(p, x, Z, label = "minimum estimated", marker = (:dot, :black),  color = "black")
@@ -41,7 +41,7 @@ end
 function plot_bootstrad_std(file::String)
         D = npzread(file)
 
-        p = plot()
+        p = plot(size = (300, 200))
         x = 0.
 
         try
@@ -59,8 +59,8 @@ function plot_bootstrad_std(file::String)
         α = D["alpha"]
 
 
-        plot!(p, x, y, label = "std from bootsrap resampling", line = (:green, 1.5), marker = (:dot, :green), title = " α = $α", legend=(:topright))
-        plot!(p, x, y1, label = "std from error calculus", line = (:red, 1.5), marker = (:dot, :red), title = " α = $α" , legend=(:topright))
+        plot!(p, x, y, label = "std from bootsrap resampling", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
+        plot!(p, x, y1, label = "std from error calculus", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
 
         ylabel!("energy")
 
@@ -75,7 +75,7 @@ function plot_minenergy_vs_ground(file::String)
 
     D = npzread(file)
 
-    p = plot()
+    p = plot(size = (300, 200))
 
     x = 0.
 
@@ -87,11 +87,14 @@ function plot_minenergy_vs_ground(file::String)
         xlabel!("Metropolis Hastings β")
     end
 
+    println(D["minimum_from_data"])
+    println(D["ground"])
+
     Z = ( D["minimum_from_data"] .- D["ground"])/abs(D["ground"])
 
     plot!(p, x, Z, markershape = :circle, legend=(:topright), color = "red", label = false)
 
-    ylabel!("(minimal energy - true ground)/|true ground|")
+    ylabel!("(Hₘᵢₙ - H₀)/|H₀|")
 
     str = "_energies_vsground"
     file1 = replace(file, ".npz" => str*".pdf")
@@ -114,7 +117,7 @@ function plot_betas(file::String)
     Z = D["estimated_betas"]
 
 
-    p = plot(x, Z, legend=(:topright), color = "red", label = "β")
+    p = plot(x, Z, legend=(:topright), size = (300, 200), color = "red", label = "β")
 
     plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
 
@@ -147,10 +150,12 @@ function plot_p_values(file::String)
     end
 
     Z = D["p_values"]
-    Z = Z .+ 1*10^-5
+
+    println(Z)
+    Z = Z .+ 1*10^-8
 
 
-    p = plot(x, Z, title = "α = $α", markershape = :circle, legend=(:topright), label = false, color = "red", ylims = (10^-5,1.), yaxis=:log)
+    p = plot(x, Z, markershape = :circle, size = (300, 200), legend=(:topright), label = "α = $α", color = "red", ylims = (10^-5,1.), yaxis=:log)
 
     try
         x = D["annealing_times"]
