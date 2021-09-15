@@ -59,10 +59,10 @@ function plot_bootstrad_std(file::String)
         α = D["alpha"]
 
 
-        plot!(p, x, y, label = "std from bootsrap resampling", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
-        plot!(p, x, y1, label = "std from error calculus", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
+        plot!(p, x, y, label = "bootsrap", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
+        plot!(p, x, y1, label = "Eq.(12)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
 
-        ylabel!("energy")
+        ylabel!("std(E₀)")
 
 
         str = "_bootstrad_std"
@@ -87,8 +87,6 @@ function plot_minenergy_vs_ground(file::String)
         xlabel!("Metropolis Hastings β")
     end
 
-    println(D["minimum_from_data"])
-    println(D["ground"])
 
     Z = ( D["minimum_from_data"] .- D["ground"])/abs(D["ground"])
 
@@ -149,13 +147,15 @@ function plot_p_values(file::String)
         x = D["betas"]
     end
 
+
+    Z1 = D["p_values_14"]
+    p = plot(x, Z1, markershape = :square, label = "α = 0.14", color = "orange", ylims = (-0.1, 1.1))
+
     Z = D["p_values"]
+    plot!(p, x, Z, markershape = :circle, size = (300, 200), legend=(:topright), label = "α = $α", color = "red", ylims = (-0.1, 1.1))
 
-    println(Z)
-    Z = Z .+ 1*10^-8
-
-
-    p = plot(x, Z, markershape = :circle, size = (300, 200), legend=(:topright), label = "α = $α", color = "red", ylims = (10^-5,1.), yaxis=:log)
+    Z2 = D["p_values_24"]
+    plot!(p, x, Z2, markershape = :star, label = "α = 0.24", color = "brown", ylims = (-0.1, 1.1))
 
     try
         x = D["annealing_times"]
