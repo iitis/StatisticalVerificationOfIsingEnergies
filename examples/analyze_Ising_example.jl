@@ -13,7 +13,13 @@ function estimate_min(file::String)
     D = npzread(file)
     α = 0.19
 
-    ens = D["energies01"]
+    ens = 0
+    try:
+        ens = D["energies01"]
+    catch:
+        ens = D["energies"]
+    end
+
 
     S = 1_000
 
