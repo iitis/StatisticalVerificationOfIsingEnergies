@@ -3,6 +3,7 @@ using Plots
 using ArgParse
 using StatsBase
 using HypothesisTests
+using LsqFit
 
 
 function plot_minimal_energies(file::String)
@@ -17,6 +18,7 @@ function plot_minimal_energies(file::String)
         catch
             x = D["betas"]
             xlabel!("Metropolis Hastings β")
+            plot!(xscale = (:log))
         end
 
         y =  [D["ground"] for _ in 1:length(x)]
@@ -44,17 +46,21 @@ function plot_bootstrad_std(file::String)
         p = plot(size = (300, 200))
         x = 0.
 
+        y = D["bootstrap_std"]
+        y1 = D["squared_error"]
+
         try
             x = D["annealing_times"]
             xlabel!("annelaing time μs")
         catch
             x = D["betas"]
             xlabel!("Metropolis Hastings β")
+            plot!(p, ylims = (0, 1.1*maximum(y1[1:10])))
+            plot!(p, xaxis = (:log), xlims = (0.04, 1.))
+            l = 5
+            vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
         end
 
-
-        y = D["bootstrap_std"]
-        y1 = D["squared_error"]
 
         α = D["alpha"]
 
@@ -68,6 +74,50 @@ function plot_bootstrad_std(file::String)
         str = "_bootstrad_std"
         file1 = replace(file, ".npz" => str*".pdf")
         savefig(p, file1)
+
+end
+
+
+function plot_skewness(file::String, l::Int = 0)
+
+    D = npzread(file)
+
+    try
+
+        p = plot(size = (300, 200))
+
+        x = D["betas"]
+        xlabel!("Metropolis Hastings β")
+
+        l = 5
+
+        z = D["eta"]
+
+        @. model(x, p) = p[1]*x^(p[2]/2)
+        p0 = [0.5, 0.5]
+
+        fit = curve_fit(model, x[1:l], z[1:l], p0)
+
+        f(x, a = fit.param[1], b = fit.param[2]) = a*x^(b/2)
+
+
+        plot!(p, x, z, markershape = :circle, legend=(:topleft), color = "red", label = "epmpirical data", xaxis = (:log), ylims = (0., 2.5))
+        plot!(p, x, [f(i) for i in x], linewidth = 2, style = :dot, color = "black", label = "fit with α = $(round(fit.param[2], digits=2))")
+
+        vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "fitting limit β = $(x[l])")
+
+
+        ylabel!("η(H)")
+
+        str = "_etas"
+        file1 = replace(file, ".npz" => str*".pdf")
+        savefig(p, file1)
+
+
+    catch
+        0
+    end
+
 
 end
 
@@ -85,6 +135,9 @@ function plot_minenergy_vs_ground(file::String)
     catch
         x = D["betas"]
         xlabel!("Metropolis Hastings β")
+        plot!(p, xaxis = (:log), ylims = (-0.02, 1.1))
+        l = 5
+        vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
     end
 
 
@@ -105,17 +158,22 @@ function plot_betas(file::String)
     D = npzread(file)
 
     x = 0.
+    p = plot(size = (300, 200))
 
     try
         x = D["annealing_times"]
     catch
         x = D["betas"]
+        plot!(p, x, x, style = :dot, linewidth = 2., color = "black", label = "expected")
+        plot!(xlims = (0.04, 1.), ylims = (0, .7))
+        l = 5
+        vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
     end
 
     Z = D["estimated_betas"]
 
 
-    p = plot(x, Z, legend=(:topright), size = (300, 200), color = "red", label = "β")
+    plot!(p, x, Z, legend=(:bottomright), color = "red", label = "β")
 
     plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
 
@@ -138,24 +196,30 @@ function plot_p_values(file::String)
 
     D = npzread(file)
 
+    p = plot(size = (300, 200))
+
     α = D["alpha"]
 
     x = 0.
     try
         x = D["annealing_times"]
+        plot!(p, ylims = (-0.1, 1.1))
     catch
         x = D["betas"]
+        l = 5
+        plot!(p, xaxis = (:log), ylims = (-0.1, 1.6))
+        vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
     end
 
 
     Z1 = D["p_values_14"]
-    p = plot(x, Z1, markershape = :square, label = "α = 0.14", color = "orange", ylims = (-0.1, 1.1))
+    plot!(p, x, Z1, markershape = :square, label = "α = 0.14", color = "orange")
 
     Z = D["p_values"]
-    plot!(p, x, Z, markershape = :circle, size = (300, 200), legend=(:topright), label = "α = $α", color = "red", ylims = (-0.1, 1.1))
+    plot!(p, x, Z, markershape = :circle, legend=(:topright), label = "α = $α", color = "red")
 
-    Z2 = D["p_values_24"]
-    plot!(p, x, Z2, markershape = :star, label = "α = 0.24", color = "brown", ylims = (-0.1, 1.1))
+    Z2 = D["p_values_26"]
+    plot!(p, x, Z2, markershape = :star, label = "α = 0.26", color = "brown")
 
     try
         x = D["annealing_times"]
@@ -183,6 +247,7 @@ function main(file::String)
     plot_betas(file)
     plot_p_values(file)
     plot_minenergy_vs_ground(file)
+    plot_skewness(file)
 
 end
 
