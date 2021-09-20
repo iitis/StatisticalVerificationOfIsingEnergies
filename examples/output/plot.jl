@@ -1,5 +1,6 @@
 using NPZ
 using Plots
+using Plots.PlotMeasures
 using ArgParse
 using StatsBase
 using HypothesisTests
@@ -196,43 +197,42 @@ function plot_p_values(file::String)
 
     D = npzread(file)
 
-    p = plot(size = (300, 200))
+    ZZ = ( D["minimum_from_data"] .- D["ground"])/abs(D["ground"])
+    li = maximum([1.3*maximum(ZZ), 0.4])
 
+    p = plot(size = (400, 280), ylims = (-0.01, li))
+    p1 = twinx()
     α = D["alpha"]
 
     x = 0.
     try
         x = D["annealing_times"]
-        plot!(p, ylims = (-0.1, 1.1))
+        xlabel!("annelaing time μs")
+        plot!(p1, ylims = (-0.1, 1.3))
     catch
         x = D["betas"]
         l = 5
-        plot!(p, xaxis = (:log), ylims = (-0.1, 1.6))
+        plot!(p, xaxis = (:log), ylims = (-0.01, 1.5))
+        plot!(p1, xaxis = (:log), ylims = (-0.1, 1.3))
+
         vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
-    end
-
-
-    Z1 = D["p_values_14"]
-    plot!(p, x, Z1, markershape = :square, label = "α = 0.14", color = "orange")
-
-    Z = D["p_values"]
-    plot!(p, x, Z, markershape = :circle, legend=(:topright), label = "α = $α", color = "red")
-
-    Z2 = D["p_values_26"]
-    plot!(p, x, Z2, markershape = :star, label = "α = 0.26", color = "brown")
-
-    try
-        x = D["annealing_times"]
-        xlabel!("annelaing time μs")
-    catch
         xlabel!("Metropolis Hastings β")
     end
-    ylabel!("p - value")
 
+    plot!(p, x, ZZ, markershape = :square, legend=(:topleft), markersise = 10., color = "black", label = "enegies", ylabel = "(Hₘᵢₙ - H₀)/|H₀|", right_margin=12mm)
+
+    Z1 = D["p_values_14"]
+    plot!(p1, x, Z1, markershape = :circ, legend=(:topright), label = "p-val., α = 0.14", color = "orange", ylabel = "p - value", right_margin=12mm)
+
+    Z = D["p_values"]
+    plot!(p1, x, Z, markershape = :diamond, label = "p-val., α = $α", color = "red")
+
+    Z2 = D["p_values_26"]
+    plot!(p1, x, Z2, markershape = :star, label = "p-val., α = 0.26", color = "brown")
 
     str = "_p_values"
     file1 = replace(file, ".npz" => str*".pdf")
-    savefig(p, file1)
+    savefig(file1)
 
 
 end
@@ -241,13 +241,13 @@ end
 
 function main(file::String)
 
-    plot_minimal_energies(file)
-    plot_bootstrad_std(file)
+    #plot_minimal_energies(file)
+    #plot_bootstrad_std(file)
 
-    plot_betas(file)
+    #plot_betas(file)
     plot_p_values(file)
-    plot_minenergy_vs_ground(file)
-    plot_skewness(file)
+    #plot_minenergy_vs_ground(file)
+    #plot_skewness(file)
 
 end
 
