@@ -200,7 +200,7 @@ function plot_p_values(file::String)
     ZZ = ( D["minimum_from_data"] .- D["ground"])/abs(D["ground"])
     li = maximum(ZZ)
 
-    p = plot(size = (400, 280), ylims = (-0.01, li))
+    p = plot(size = (400, 250))
     p1 = twinx()
     α = D["alpha"]
 
@@ -208,8 +208,8 @@ function plot_p_values(file::String)
     try
         x = D["annealing_times"]
         xlabel!("annelaing time μs")
-        plot!(p, legend=(0.15, 0.45))
-        plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.4))
+        plot!(p, legend=(0.15, 0.45), ylims = (-0.01, 1.05*li))
+        plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.55))
     catch
         x = D["betas"]
         l = 5
@@ -221,7 +221,7 @@ function plot_p_values(file::String)
         xlabel!("Metropolis Hastings β")
     end
 
-    plot!(p, x, ZZ, markershape = :square, markersise = 10., color = "black", label = "enegies", ylabel = "(Hₘᵢₙ - H₀)/|H₀|", right_margin=12mm)
+    plot!(p, x, ZZ, markershape = :square, linewidth = 2, markersise = 10., color = "blue", label = "Hs", ylabel = "(Hₘᵢₙ - H₀)/|H₀|", right_margin=12mm)
 
     Z1 = D["p_values_14"]
     plot!(p1, x, Z1, markershape = :circ, label = "p-val., α = 0.14", color = "orange", ylabel = "p - value", right_margin=12mm)
