@@ -85,7 +85,7 @@ function plot_skewness(file::String, l::Int = 0)
 
     try
 
-        p = plot(size = (300, 200))
+        p = plot(size = (300, 150))
 
         x = D["betas"]
         xlabel!("Metropolis Hastings β")
@@ -198,7 +198,7 @@ function plot_p_values(file::String)
     D = npzread(file)
 
     ZZ = ( D["minimum_from_data"] .- D["ground"])/abs(D["ground"])
-    li = maximum([1.3*maximum(ZZ), 0.4])
+    li = maximum(ZZ)
 
     p = plot(size = (400, 280), ylims = (-0.01, li))
     p1 = twinx()
@@ -208,21 +208,23 @@ function plot_p_values(file::String)
     try
         x = D["annealing_times"]
         xlabel!("annelaing time μs")
-        plot!(p1, ylims = (-0.1, 1.3))
+        plot!(p, legend=(0.15, 0.45))
+        plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.4))
     catch
         x = D["betas"]
         l = 5
-        plot!(p, xaxis = (:log), ylims = (-0.01, 1.5))
-        plot!(p1, xaxis = (:log), ylims = (-0.1, 1.3))
+        plot!(p, xaxis = (:log))
+        plot!(p, legend=(-0.1, 1.), ylims = (-0.01, 1.5*li))
+        plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.33))
 
         vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
         xlabel!("Metropolis Hastings β")
     end
 
-    plot!(p, x, ZZ, markershape = :square, legend=(:topleft), markersise = 10., color = "black", label = "enegies", ylabel = "(Hₘᵢₙ - H₀)/|H₀|", right_margin=12mm)
+    plot!(p, x, ZZ, markershape = :square, markersise = 10., color = "black", label = "enegies", ylabel = "(Hₘᵢₙ - H₀)/|H₀|", right_margin=12mm)
 
     Z1 = D["p_values_14"]
-    plot!(p1, x, Z1, markershape = :circ, legend=(:topright), label = "p-val., α = 0.14", color = "orange", ylabel = "p - value", right_margin=12mm)
+    plot!(p1, x, Z1, markershape = :circ, label = "p-val., α = 0.14", color = "orange", ylabel = "p - value", right_margin=12mm)
 
     Z = D["p_values"]
     plot!(p1, x, Z, markershape = :diamond, label = "p-val., α = $α", color = "red")
