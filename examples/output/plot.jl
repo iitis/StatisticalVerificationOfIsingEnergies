@@ -127,7 +127,7 @@ function plot_betas(file::String, l::Int)
     catch
         x = D["betas"]
         plot!(p, x, x, style = :dot, linewidth = 2., color = "black", label = "expected")
-        plot!(xlims = (0.04, 1.), ylims = (0, .7))
+        #plot!(xlims = (0.04, 2.), ylims = (0, 1.))
         vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
     end
 
