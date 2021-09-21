@@ -96,7 +96,8 @@ function plot_skewness(file::String, l::Int )
         fit = curve_fit(model, x[1:l], z[1:l], p0)
         f(x, a = fit.param[1], b = fit.param[2]) = a*x^(b/2)
 
-        plot!(p, x, z, markershape = :circle, legend=(:topleft), color = "red", label = "epmpirical data", xaxis = (:log), ylims = (0., 2.5))
+        plot!(p, x, z, markershape = :circle, legend=(:topleft), color = "red", label = "epmpirical data", xaxis = (:log))
+        #plot!(p, ylims = (0., 2.5))
         plot!(p, x, [f(i) for i in x], linewidth = 2, style = :dot, color = "black", label = "fit with α = $(round(fit.param[2], digits=2))")
 
         vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "fitting limit β = $(x[l])")
@@ -158,20 +159,20 @@ function plot_p_values(file::String, l::Int)
     p = plot(size = (400, 250))
     p1 = twinx()
     α = D["alpha"]
+
     x = 0.
     try
         x = D["annealing_times"]
-        plot!(p, legend=(0.15, 0.45), ylims = (-0.01, 1.05*li))
-        plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.55))
         xlabel!("annelaing time μs")
     catch
         x = D["betas"]
         plot!(p, xaxis = (:log))
-        plot!(p, legend=(-0.1, 1.), ylims = (-0.01, 1.5*li))
-        plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.33))
         vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
         xlabel!("Metropolis Hastings β")
     end
+
+    plot!(p, legend=(0.15, 0.45), ylims = (-0.01, 1.05*li))
+    plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.55))
     plot!(p, x, ZZ, markershape = :square, linewidth = 2, markersise = 10., color = "blue", label = "Hs", ylabel = "(Hₘᵢₙ - H₀)/|H₀|", right_margin=12mm)
 
     Z1 = D["p_values_14"]
