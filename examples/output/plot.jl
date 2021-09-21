@@ -41,7 +41,7 @@ function plot_minimal_energies(file::String)
 end
 
 
-function plot_bootstrad_std(file::String, l::Int = 0)
+function plot_bootstrad_std(file::String, l::Int)
         D = npzread(file)
 
         p = plot(size = (300, 200))
@@ -57,8 +57,7 @@ function plot_bootstrad_std(file::String, l::Int = 0)
             x = D["betas"]
             xlabel!("Metropolis Hastings β")
             #plot!(p, ylims = (0, 1.1*maximum(y1[1:10])))
-            plot!(p, xaxis = (:log), xlims = (0.04, 1.))
-            l = 5
+            plot!(p, xaxis = (:log))
             vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
         end
 
@@ -190,7 +189,13 @@ function plot_p_values(file::String, l::Int)
 end
 
 
-function main(file::String, β_lim_ind = 5)
+function main(file::String)
+    β_lim_ind = 0
+    if occursin("artificial_trains_case1", file)
+        β_lim_ind = 6
+    elseif occursin("artificial_trains_short", file)
+        β_lim_ind = 5
+    end
     plot_minimal_energies(file)
     plot_bootstrad_std(file, β_lim_ind)
     plot_betas(file, β_lim_ind)
