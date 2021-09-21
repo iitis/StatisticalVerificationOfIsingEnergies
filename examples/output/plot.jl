@@ -41,7 +41,7 @@ function plot_minimal_energies(file::String)
 end
 
 
-function plot_bootstrad_std(file::String)
+function plot_bootstrad_std(file::String, l::Int = 0)
         D = npzread(file)
 
         p = plot(size = (300, 200))
@@ -56,7 +56,7 @@ function plot_bootstrad_std(file::String)
         catch
             x = D["betas"]
             xlabel!("Metropolis Hastings β")
-            plot!(p, ylims = (0, 1.1*maximum(y1[1:10])))
+            #plot!(p, ylims = (0, 1.1*maximum(y1[1:10])))
             plot!(p, xaxis = (:log), xlims = (0.04, 1.))
             l = 5
             vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
@@ -79,18 +79,14 @@ function plot_bootstrad_std(file::String)
 end
 
 
-function plot_skewness(file::String, l::Int = 0)
+function plot_skewness(file::String, l::Int )
 
     D = npzread(file)
 
     try
-
         p = plot(size = (300, 150))
-
         x = D["betas"]
         xlabel!("Metropolis Hastings β")
-
-        l = 5
 
         z = D["eta"]
 
@@ -98,15 +94,12 @@ function plot_skewness(file::String, l::Int = 0)
         p0 = [0.5, 0.5]
 
         fit = curve_fit(model, x[1:l], z[1:l], p0)
-
         f(x, a = fit.param[1], b = fit.param[2]) = a*x^(b/2)
-
 
         plot!(p, x, z, markershape = :circle, legend=(:topleft), color = "red", label = "epmpirical data", xaxis = (:log), ylims = (0., 2.5))
         plot!(p, x, [f(i) for i in x], linewidth = 2, style = :dot, color = "black", label = "fit with α = $(round(fit.param[2], digits=2))")
 
         vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "fitting limit β = $(x[l])")
-
 
         ylabel!("η(H)")
 
@@ -119,45 +112,13 @@ function plot_skewness(file::String, l::Int = 0)
         0
     end
 
-
 end
 
-function plot_minenergy_vs_ground(file::String)
+
+
+function plot_betas(file::String, l::Int)
 
     D = npzread(file)
-
-    p = plot(size = (300, 200))
-
-    x = 0.
-
-    try
-        x = D["annealing_times"]
-        xlabel!("annelaing time μs")
-    catch
-        x = D["betas"]
-        xlabel!("Metropolis Hastings β")
-        plot!(p, xaxis = (:log), ylims = (-0.02, 1.1))
-        l = 5
-        vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
-    end
-
-
-    Z = ( D["minimum_from_data"] .- D["ground"])/abs(D["ground"])
-
-    plot!(p, x, Z, markershape = :circle, legend=(:topright), color = "red", label = false)
-
-    ylabel!("(Hₘᵢₙ - H₀)/|H₀|")
-
-    str = "_energies_vsground"
-    file1 = replace(file, ".npz" => str*".pdf")
-    savefig(p, file1)
-
-end
-
-function plot_betas(file::String)
-
-    D = npzread(file)
-
     x = 0.
     p = plot(size = (300, 200))
 
@@ -167,15 +128,12 @@ function plot_betas(file::String)
         x = D["betas"]
         plot!(p, x, x, style = :dot, linewidth = 2., color = "black", label = "expected")
         plot!(xlims = (0.04, 1.), ylims = (0, .7))
-        l = 5
         vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
     end
 
     Z = D["estimated_betas"]
 
-
     plot!(p, x, Z, legend=(:bottomright), color = "red", label = "β")
-
     plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
 
     try
@@ -186,41 +144,34 @@ function plot_betas(file::String)
     end
     ylabel!("β estimated")
 
-
     str = "_betas"
     file1 = replace(file, ".npz" => str*".pdf")
     savefig(p, file1)
 
 end
 
-function plot_p_values(file::String)
+function plot_p_values(file::String, l::Int)
 
     D = npzread(file)
-
     ZZ = ( D["minimum_from_data"] .- D["ground"])/abs(D["ground"])
     li = maximum(ZZ)
-
     p = plot(size = (400, 250))
     p1 = twinx()
     α = D["alpha"]
-
     x = 0.
     try
         x = D["annealing_times"]
-        xlabel!("annelaing time μs")
         plot!(p, legend=(0.15, 0.45), ylims = (-0.01, 1.05*li))
         plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.55))
+        xlabel!("annelaing time μs")
     catch
         x = D["betas"]
-        l = 5
         plot!(p, xaxis = (:log))
         plot!(p, legend=(-0.1, 1.), ylims = (-0.01, 1.5*li))
         plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.33))
-
         vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
         xlabel!("Metropolis Hastings β")
     end
-
     plot!(p, x, ZZ, markershape = :square, linewidth = 2, markersise = 10., color = "blue", label = "Hs", ylabel = "(Hₘᵢₙ - H₀)/|H₀|", right_margin=12mm)
 
     Z1 = D["p_values_14"]
@@ -235,21 +186,15 @@ function plot_p_values(file::String)
     str = "_p_values"
     file1 = replace(file, ".npz" => str*".pdf")
     savefig(file1)
-
-
 end
 
 
-
-function main(file::String)
-
-    #plot_minimal_energies(file)
-    #plot_bootstrad_std(file)
-
-    #plot_betas(file)
-    plot_p_values(file)
-    #plot_minenergy_vs_ground(file)
-    #plot_skewness(file)
+function main(file::String, β_lim_ind = 5)
+    plot_minimal_energies(file)
+    plot_bootstrad_std(file, β_lim_ind)
+    plot_betas(file, β_lim_ind)
+    plot_p_values(file, β_lim_ind)
+    plot_skewness(file, β_lim_ind)
 
 end
 
