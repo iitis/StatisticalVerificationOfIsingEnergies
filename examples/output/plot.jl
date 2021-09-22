@@ -192,7 +192,7 @@ end
 function main(file::String)
     β_lim_ind = 0
     if occursin("artificial_trains_case1", file)
-        β_lim_ind = 6
+        β_lim_ind = 7
     elseif occursin("artificial_trains_short", file)
         β_lim_ind = 5
     end
