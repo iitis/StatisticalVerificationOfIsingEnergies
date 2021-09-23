@@ -23,8 +23,8 @@ function estimate_min(file::String)
     eta = [skewness(ens[:,i]) for i in 1:l]
     min_estimated = [estimate_ground_state_energy(ens[:,i], α) for i in 1:l]
     p_values = [bootstrap_get_pvalue(ens[:,i], α, S) for i in 1:l]
-    p_values_14 = [bootstrap_get_pvalue(ens[:,i], 0.14, S) for i in 1:l]
-    p_values_26 = [bootstrap_get_pvalue(ens[:,i], 0.26, S) for i in 1:l]
+    p_values_10 = [bootstrap_get_pvalue(ens[:,i], 0.10, S) for i in 1:l]
+    p_values_39 = [bootstrap_get_pvalue(ens[:,i], 0.39, S) for i in 1:l]
 
     ys = [bootstrap_hists_of_mins(ens[:,i], α, S) for i in 1:l]
     q95 = [quantile(y, 0.95) for y in ys]
@@ -43,8 +43,8 @@ function estimate_min(file::String)
     push!(D, "minimum_from_data" => min_data)
     push!(D, "minimum_estimated" => min_estimated)
     push!(D, "p_values" => p_values)
-    push!(D, "p_values_14" => p_values_14)
-    push!(D, "p_values_26" => p_values_26)
+    push!(D, "p_values_10" => p_values_10)
+    push!(D, "p_values_39" => p_values_39)
     push!(D, "estimated_betas" => betas)
     push!(D, "bootstrap_std" => bootstrap_std)
     push!(D, "bootstrap_q95" => q95)

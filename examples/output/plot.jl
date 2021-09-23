@@ -182,17 +182,17 @@ function plot_p_values(file::String, l::Int)
     end
 
     plot!(p, legend=(0.15, 0.45), ylims = (-0.01, 1.05*li))
-    plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.55))
+    plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.45))
     plot!(p, x, ZZ, markershape = :square, linewidth = 2, markersise = 10., color = "blue", label = "Hs", ylabel = "(Hₘᵢₙ - H₀)/|H₀|", right_margin=12mm)
 
-    Z1 = D["p_values_14"]
-    plot!(p1, x, Z1, markershape = :circ, label = "p-val., α = 0.14", color = "orange", ylabel = "p - value", right_margin=12mm)
+    Z1 = D["p_values_10"]
+    plot!(p1, x, Z1, markershape = :circ, label = "p-val., α = 0.10", color = "orange", ylabel = "p - value", right_margin=12mm)
 
     Z = D["p_values"]
     plot!(p1, x, Z, markershape = :diamond, label = "p-val., α = $α", color = "red")
 
-    Z2 = D["p_values_26"]
-    plot!(p1, x, Z2, markershape = :star, label = "p-val., α = 0.26", color = "brown")
+    Z2 = D["p_values_39"]
+    plot!(p1, x, Z2, markershape = :star, label = "p-val., α = 0.39", color = "brown")
 
     str = "_p_values"
     file1 = replace(file, ".npz" => str*".pdf")
