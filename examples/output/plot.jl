@@ -5,6 +5,7 @@ using ArgParse
 using StatsBase
 using HypothesisTests
 using LsqFit
+using Compose
 
 
 function plot_minimal_energies(file::String)
@@ -58,7 +59,7 @@ function plot_bootstrad_std(file::String, l::Int)
             xlabel!("Metropolis Hastings β")
             #plot!(p, ylims = (0, 1.1*maximum(y1[1:10])))
             plot!(p, xaxis = (:log))
-            vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
+            #vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
         end
 
 
@@ -83,7 +84,7 @@ function plot_skewness(file::String, l::Int )
     D = npzread(file)
 
     try
-        p = plot(size = (300, 150))
+        p = plot(size = (300, 200))
         x = D["betas"]
         xlabel!("Metropolis Hastings β")
 
@@ -122,18 +123,27 @@ function plot_betas(file::String, l::Int)
     x = 0.
     p = plot(size = (300, 200))
 
+    Z = D["estimated_betas"]
+
     try
         x = D["annealing_times"]
     catch
         x = D["betas"]
-        plot!(p, x, x, style = :dot, linewidth = 2., color = "black", label = "expected")
+        #plot!(p, x, x, style = :dot, linewidth = 2., color = "black", label = "1 to 1")
         #plot!(xlims = (0.04, 2.), ylims = (0, 1.))
         vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
+
+        @. model(x, p) = p[1]+p[2]*x
+        p0 = [0.5, 0.5]
+
+        fit = curve_fit(model, x[1:l], Z[1:l], p0)
+        f(x, a = fit.param[1], b = fit.param[2]) = a+x*b
+
+        plot!(p, x, [f(i) for i in x], linewidth = 2, style = :dot, color = "blue", label = "linear model, slope $(round(fit.param[2], digits = 2))")
     end
 
-    Z = D["estimated_betas"]
 
-    plot!(p, x, Z, legend=(:bottomright), color = "red", label = "β")
+    plot!(p, x, Z, legend=(:topright), color = "red", label = "β")
     plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
 
     try
@@ -167,6 +177,7 @@ function plot_p_values(file::String, l::Int)
         x = D["betas"]
         plot!(p, xaxis = (:log))
         vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
+
         xlabel!("Metropolis Hastings β")
     end
 
@@ -192,7 +203,7 @@ end
 function main(file::String)
     β_lim_ind = 0
     if occursin("artificial_trains_case1", file)
-        β_lim_ind = 7
+        β_lim_ind = 8
     elseif occursin("artificial_trains_short", file)
         β_lim_ind = 5
     end
