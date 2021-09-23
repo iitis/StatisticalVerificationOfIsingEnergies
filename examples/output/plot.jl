@@ -45,7 +45,7 @@ end
 function plot_bootstrad_std(file::String, l::Int)
         D = npzread(file)
 
-        p = plot(size = (300, 200))
+        p = plot(size = (400, 250))
         x = 0.
 
         y = D["bootstrap_std"]
