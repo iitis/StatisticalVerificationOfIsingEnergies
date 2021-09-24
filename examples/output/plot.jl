@@ -100,7 +100,7 @@ function plot_skewness(file::String, l::Int )
         #plot!(p, ylims = (0., 2.5))
         plot!(p, x, [f(i) for i in x], linewidth = 2, style = :dot, color = "black", label = "fit with α = $(round(fit.param[2], digits=2))")
 
-        vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "fitting limit β = $(x[l])")
+        vline!([(x[l] + x[l+1])/2], style = :dot, linewidth = 2., color = "green", label = "model limit")
 
         ylabel!("η(H)")
 
@@ -131,7 +131,7 @@ function plot_betas(file::String, l::Int)
         x = D["betas"]
         #plot!(p, x, x, style = :dot, linewidth = 2., color = "black", label = "1 to 1")
         #plot!(xlims = (0.04, 2.), ylims = (0, 1.))
-        vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
+        vline!([(x[l]+x[l+1])/2], style = :dot, linewidth = 2., color = "green", label = "model limit  β = $((x[l] + x[l+1])/2)")
 
         @. model(x, p) = p[1]+p[2]*x
         p0 = [0.5, 0.5]
@@ -176,13 +176,13 @@ function plot_p_values(file::String, l::Int)
     catch
         x = D["betas"]
         plot!(p, xaxis = (:log))
-        vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
+        vline!([(x[l]+x[l+1])/2], style = :dot, linewidth = 2., color = "green", label = "model limit")
 
         xlabel!("Metropolis Hastings β")
     end
 
     plot!(p, legend=(0.15, 0.45), ylims = (-0.01, 1.05*li))
-    plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.45))
+    plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.90))
     plot!(p, x, ZZ, markershape = :square, linewidth = 2, markersise = 10., color = "blue", label = "Hs", ylabel = "(Hₘᵢₙ - H₀)/|H₀|", right_margin=12mm)
 
     Z1 = D["p_values_10"]
@@ -203,9 +203,9 @@ end
 function main(file::String)
     β_lim_ind = 0
     if occursin("artificial_trains_case1", file)
-        β_lim_ind = 8
+        β_lim_ind = 10
     elseif occursin("artificial_trains_short", file)
-        β_lim_ind = 5
+        β_lim_ind = 6
     end
     plot_minimal_energies(file)
     plot_bootstrad_std(file, β_lim_ind)
