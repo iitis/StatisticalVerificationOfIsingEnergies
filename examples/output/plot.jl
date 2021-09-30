@@ -27,10 +27,10 @@ function plot_minimal_energies(file::String)
         α = D["alpha"]
         Z = D["minimum_estimated"]
 
-        plot!(p, x, y, label = "true ground", line = (:green, 1.5), legend=false)
+        plot!(p, x, y, label = "true ground", markershape = :auto, color = "green", legend=false)
 
-        plot!(p, x, D["minimum_from_data"], line = (:red, 1.), marker = (:dot, :red), label = "minimum from D-Wave samples")
-        plot!(p, x, Z, label = "minimum estimated", marker = (:dot, :black),  color = "black")
+        plot!(p, x, D["minimum_from_data"], markershape = :auto, color = "red", label = "minimum from D-Wave samples")
+        plot!(p, x, Z, label = "minimum estimated", markershape = :auto,  color = "black")
 
         plot!(p, x, D["bootstrap_q95"], color = "gray", label = "95 percentile of estimated min.", line = (:dash))
         ylabel!("minimal energy")
