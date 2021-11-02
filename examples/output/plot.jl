@@ -6,6 +6,7 @@ using StatsBase
 using HypothesisTests
 using LsqFit
 using Compose
+using LaTeXStrings
 
 
 function plot_minimal_energies(file::String)
@@ -16,10 +17,10 @@ function plot_minimal_energies(file::String)
         x = 0.
         try
             x = D["annealing_times"]
-            xlabel!("annelaing time μs")
+            xlabel!(L"\textrm{annelaing} \ \textrm{time} \ \mu s")
         catch
             x = D["betas"]
-            xlabel!("Metropolis Hastings β")
+            xlabel!(L"$\beta_{MH}$")
             plot!(xscale = (:log))
         end
 
@@ -53,10 +54,10 @@ function plot_bootstrad_std(file::String, l::Int)
 
         try
             x = D["annealing_times"]
-            xlabel!("annelaing time μs")
+            xlabel!(L"\textrm{annelaing} \ \textrm{time} \ \mu s")
         catch
             x = D["betas"]
-            xlabel!("Metropolis Hastings β")
+            xlabel!(L"$ \beta_{MH} $")
             #plot!(p, ylims = (0, 1.1*maximum(y1[1:10])))
             plot!(p, xaxis = (:log))
             #vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
@@ -69,7 +70,7 @@ function plot_bootstrad_std(file::String, l::Int)
         plot!(p, x, y, label = "bootsrap", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
         plot!(p, x, y1, label = "Eq.(12)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
 
-        ylabel!("std(E₀)")
+        ylabel!(L" \textrm{std}(E_{0})")
 
 
         str = "_bootstrad_std"
@@ -86,7 +87,7 @@ function plot_skewness(file::String, l::Int )
     try
         p = plot(size = (300, 200))
         x = D["betas"]
-        xlabel!("Metropolis Hastings β")
+        xlabel!(L"$\beta_{MH}$")
 
         z = D["eta"]
 
@@ -102,7 +103,7 @@ function plot_skewness(file::String, l::Int )
 
         vline!([(x[l] + x[l+1])/2], style = :dot, linewidth = 2., color = "green", label = "model limit")
 
-        ylabel!("η(H)")
+        ylabel!(L"$\eta(H)$")
 
         str = "_etas"
         file1 = replace(file, ".npz" => str*".pdf")
@@ -143,16 +144,16 @@ function plot_betas(file::String, l::Int)
     end
 
 
-    plot!(p, x, Z, legend=(:topright), color = "red", label = "β")
+    plot!(p, x, Z, legend=(:topright), color = "red", label = L"\beta")
     plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
 
     try
         x = D["annealing_times"]
-        xlabel!("annelaing time μs")
+        xlabel!(L"\textrm{annelaing} \ \textrm{time} \ \mu s")
     catch
-        xlabel!("Metropolis Hastings β")
+        xlabel!(L"\beta_{MH}")
     end
-    ylabel!("β estimated")
+    ylabel!(L"\beta \  \textrm{ estimated}")
 
     str = "_betas"
     file1 = replace(file, ".npz" => str*".pdf")
@@ -172,18 +173,18 @@ function plot_p_values(file::String, l::Int)
     x = 0.
     try
         x = D["annealing_times"]
-        xlabel!("annelaing time μs")
+        xlabel!(L"\textrm{annelaing} \ \textrm{time} \ \mu s")
     catch
         x = D["betas"]
         plot!(p, xaxis = (:log))
         vline!([(x[l]+x[l+1])/2], style = :dot, linewidth = 2., color = "green", label = "model limit")
 
-        xlabel!("Metropolis Hastings β")
+        xlabel!(L"$\beta_{MH}$")
     end
 
     plot!(p, legend=(0.15, 0.45), ylims = (-0.01, 1.05*li))
     plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.90))
-    plot!(p, x, ZZ, markershape = :square, linewidth = 2, markersise = 10., color = "blue", label = "Hs", ylabel = "(Hₘᵢₙ - H₀)/|H₀|", right_margin=12mm)
+    plot!(p, x, ZZ, markershape = :square, linewidth = 2, markersise = 10., color = "blue", label = L"$H_s$", ylabel = L"$(H_{\min} - H_0)/|H_0|$", right_margin=12mm)
 
     Z1 = D["p_values_10"]
     plot!(p1, x, Z1, markershape = :circ, label = "p-val., α = 0.10", color = "orange", ylabel = "p - value", right_margin=12mm)
