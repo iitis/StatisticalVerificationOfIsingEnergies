@@ -29,9 +29,7 @@ function estimate_min(file::String)
     ys = [bootstrap_hists_of_mins(ens[:,i], α, S) for i in 1:l]
     q95 = [quantile(y, 0.95) for y in ys]
     bootstrap_std = [std(y) for y in ys]
-
-
-
+    bootstrap_mean = [mean(y) for y in ys]
     squared_error_from_cums = [squared_error(ens[:,i], α) for i in 1:l]
 
     e_min = D["ground"]
@@ -47,6 +45,7 @@ function estimate_min(file::String)
     push!(D, "p_values_39" => p_values_39)
     push!(D, "estimated_betas" => betas)
     push!(D, "bootstrap_std" => bootstrap_std)
+    push!(D, "bootstrap_mean" => bootstrap_mean)
     push!(D, "bootstrap_q95" => q95)
     push!(D, "squared_error" => squared_error_from_cums)
 

@@ -17,7 +17,7 @@ function plot_minimal_energies(file::String)
         x = 0.
         try
             x = D["annealing_times"]
-            xlabel!(L"\textrm{annelaing} \ \textrm{time} \ \mu s")
+            xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
         catch
             x = D["betas"]
             xlabel!(L"$\beta_{MH}$")
@@ -54,7 +54,7 @@ function plot_bootstrad_std(file::String, l::Int)
 
         try
             x = D["annealing_times"]
-            xlabel!(L"\textrm{annelaing} \ \textrm{time} \ \mu s")
+            xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
         catch
             x = D["betas"]
             xlabel!(L"$ \beta_{MH} $")
@@ -79,6 +79,40 @@ function plot_bootstrad_std(file::String, l::Int)
 
 end
 
+
+function plot_bootstrad_mean(file::String, l::Int)
+        D = npzread(file)
+
+        p = plot(size = (400, 250))
+        x = 0.
+
+        y = D["bootstrap_mean"]
+        y1 = D["minimum_estimated"]
+
+        try
+            x = D["annealing_times"]
+            xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
+        catch
+            x = D["betas"]
+            xlabel!(L"$ \beta_{MH} $")
+            plot!(p, xaxis = (:log))
+        end
+
+
+        α = D["alpha"]
+
+
+        plot!(p, x, y, label = "mean from bootsraping", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
+        plot!(p, x, y1, label = "computed by Eq (6)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
+
+        ylabel!(L"E_0")
+
+
+        str = "_bootstrad_mean"
+        file1 = replace(file, ".npz" => str*".pdf")
+        savefig(p, file1)
+
+end
 
 function plot_skewness(file::String, l::Int )
 
@@ -128,28 +162,35 @@ function plot_betas(file::String, l::Int)
 
     try
         x = D["annealing_times"]
+        plot!(ylims = (0, .8))
+        plot!(p, x, Z, label = false, color = "red")
+        plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
     catch
         x = D["betas"]
-        #plot!(p, x, x, style = :dot, linewidth = 2., color = "black", label = "1 to 1")
-        #plot!(xlims = (0.04, 2.), ylims = (0, 1.))
-        vline!([(x[l]+x[l+1])/2], style = :dot, linewidth = 2., color = "green", label = "model limit  β = $((x[l] + x[l+1])/2)")
+        #plot!(p, x, x, style = :dot, linewidth = 2., color = "black", label = "1 to 1"
+        vline!([(x[l]+x[l+1])/2], style = :dot, linewidth = 2., color = "green", label = "model limit")
+         βl = ((x[l] + x[l+1])/2)
+         println("model limit = ", βl)
 
         @. model(x, p) = p[1]+p[2]*x
         p0 = [0.5, 0.5]
 
         fit = curve_fit(model, x[1:l], Z[1:l], p0)
+        err = stderror(fit)
         f(x, a = fit.param[1], b = fit.param[2]) = a+x*b
 
-        plot!(p, x, [f(i) for i in x], linewidth = 2, style = :dot, color = "blue", label = "linear model, slope $(round(fit.param[2], digits = 2))")
+
+        label = "slope= $(round(fit.param[2], digits = 1))±$(round(err[2],  digits = 1))"
+
+        plot!(p, x, [f(i) for i in x], linewidth = 2, style = :dot, color = "blue", label = label)
+        plot!(p, x, Z, legend=:topleft, color = "red", label = L"\beta")
+        plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
     end
 
 
-    plot!(p, x, Z, legend=(:topright), color = "red", label = L"\beta")
-    plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
-
     try
         x = D["annealing_times"]
-        xlabel!(L"\textrm{annelaing} \ \textrm{time} \ \mu s")
+        xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
     catch
         xlabel!(L"\beta_{MH}")
     end
@@ -173,27 +214,33 @@ function plot_p_values(file::String, l::Int)
     x = 0.
     try
         x = D["annealing_times"]
-        xlabel!(L"\textrm{annelaing} \ \textrm{time} \ \mu s")
+        xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
+
+        plot!(p, legend=(0.15, 0.5), ylims = (-0.01, 1.05*li))
+        plot!(p1, ylims = (-0.01, 1.01), legend=(0.7, 0.55))
+
     catch
         x = D["betas"]
         plot!(p, xaxis = (:log))
         vline!([(x[l]+x[l+1])/2], style = :dot, linewidth = 2., color = "green", label = "model limit")
 
+        plot!(p, legend=(0.4, 0.6), ylims = (-0.01, 1.05*li))
+        plot!(p1, ylims = (-0.01, 1.01), legend=(0.4, 1.))
+
         xlabel!(L"$\beta_{MH}$")
     end
 
-    plot!(p, legend=(0.15, 0.45), ylims = (-0.01, 1.05*li))
-    plot!(p1, ylims = (-0.01, 1.01), legend=(0.67, 0.90))
-    plot!(p, x, ZZ, markershape = :square, linewidth = 2, markersise = 10., color = "blue", label = L"$H_s$", ylabel = L"$(H_{\min} - H_0)/|H_0|$", right_margin=12mm)
+
+    plot!(p, x, ZZ, markershape = :square, linewidth = 2, markersise = 10., color = "blue", label = L"$\Delta H $", ylabel = L"$\Delta H = (H_{\min} - H_0)/|H_0|$", right_margin=12mm)
 
     Z1 = D["p_values_10"]
-    plot!(p1, x, Z1, markershape = :circ, label = "p-val., α = 0.10", color = "orange", ylabel = "p - value", right_margin=12mm)
+    plot!(p1, x, Z1, markershape = :circ, label = "p-val. α=0.10", color = "orange", ylabel = "p - value", right_margin=12mm)
 
     Z = D["p_values"]
-    plot!(p1, x, Z, markershape = :diamond, label = "p-val., α = $α", color = "red")
+    plot!(p1, x, Z, markershape = :diamond, label = "p-val. α=$α", color = "red")
 
     Z2 = D["p_values_39"]
-    plot!(p1, x, Z2, markershape = :star, label = "p-val., α = 0.39", color = "brown")
+    plot!(p1, x, Z2, markershape = :star, label = "p-val. α=0.39", color = "brown")
 
     str = "_p_values"
     file1 = replace(file, ".npz" => str*".pdf")
@@ -210,6 +257,7 @@ function main(file::String)
     end
     plot_minimal_energies(file)
     plot_bootstrad_std(file, β_lim_ind)
+    plot_bootstrad_mean(file, β_lim_ind)
     plot_betas(file, β_lim_ind)
     plot_p_values(file, β_lim_ind)
     plot_skewness(file, β_lim_ind)

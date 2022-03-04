@@ -32,6 +32,6 @@ end
 
 @testset "estimate temparature" begin
     x = [1. ,1.5, 2., 3., 4.]
-    @test estiamte_temperature(x, 0.) ≈ 0.8958957699200034
+    @test estiamte_temperature(x, -5.) ≈ 3.4826659310464034
 
 end

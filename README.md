@@ -86,8 +86,9 @@ estiamte_temperature(energies::Vector{Float64}, ground_energy::Float64)
 julia> energies = [1. ,1.5, 2., 3., 4.];
 
 
-julia> estiamte_temperature(energies, 0.)
-0.8958957699200034
+julia> estiamte_temperature(x, -5.)
+3.4826659310464034
+
 
 
 ```

@@ -117,7 +117,7 @@ julia> estiamte_temperature(energies, 0.)
 """
 function estiamte_temperature(energies::Vector{Float64}, ground_energy::Float64)
     EH = ground_energy - mean(energies)
-    EH/(std(energies)*skewness(energies)*EH-var(energies))
+    EH/(std(energies)*skewness(energies)*EH+var(energies))
 end
 
 end
