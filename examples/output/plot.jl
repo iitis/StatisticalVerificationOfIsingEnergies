@@ -230,8 +230,8 @@ function plot_p_values(file::String, l::Int)
         xlabel!(L"$\beta_{MH}$")
     end
 
-
-    plot!(p, x, ZZ, markershape = :square, linewidth = 2, markersise = 10., color = "blue", label = L"$\Delta H $", ylabel = L"$\Delta H = (H_{\min} - H_0)/|H_0|$", right_margin=12mm)
+    lab = L"$\Delta H $"
+    plot!(p, x, ZZ, markershape = :square, linewidth = 2, markersise = 10., color = "blue", label = lab, ylabel = lab, right_margin=12mm)
 
     Z1 = D["p_values_10"]
     plot!(p1, x, Z1, markershape = :circ, label = "p-val. α=0.10", color = "orange", ylabel = "p - value", right_margin=12mm)
