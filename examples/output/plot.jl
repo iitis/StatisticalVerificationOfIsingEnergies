@@ -46,7 +46,7 @@ end
 function plot_bootstrad_std(file::String, l::Int)
         D = npzread(file)
 
-        p = plot(size = (400, 250))
+        p = plot(size = (300, 200))
         x = 0.
 
         y = D["bootstrap_std"]
@@ -58,19 +58,18 @@ function plot_bootstrad_std(file::String, l::Int)
         catch
             x = D["betas"]
             xlabel!(L"$ \beta_{MH} $")
-            #plot!(p, ylims = (0, 1.1*maximum(y1[1:10])))
             plot!(p, xaxis = (:log))
-            #vline!([x[l]], style = :dot, linewidth = 2., color = "green", label = "model limit")
+
         end
 
 
         α = D["alpha"]
 
 
-        plot!(p, x, y, label = "bootsrap", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
-        plot!(p, x, y1, label = "Eq.(12)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
+        plot!(p, x, y, label = "std. from bootsrapping", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
+        plot!(p, x, y1, label = "computed by Eq (16)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
 
-        ylabel!(L" \textrm{std}(E_{0})")
+        ylabel!(L" \sigma(H)")
 
 
         str = "_bootstrad_std"
@@ -83,7 +82,7 @@ end
 function plot_bootstrad_mean(file::String, l::Int)
         D = npzread(file)
 
-        p = plot(size = (400, 250))
+        p = plot(size = (300, 200))
         x = 0.
 
         y = D["bootstrap_mean"]
@@ -102,8 +101,8 @@ function plot_bootstrad_mean(file::String, l::Int)
         α = D["alpha"]
 
 
-        plot!(p, x, y, label = "mean from bootsraping", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
-        plot!(p, x, y1, label = "computed by Eq (6)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
+        plot!(p, x, y, label = "mean from bootsrapping", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
+        plot!(p, x, y1, label = "computed by Eq (9)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
 
         ylabel!(L"E_0")
 
@@ -131,11 +130,10 @@ function plot_skewness(file::String, l::Int )
         fit = curve_fit(model, x[1:l], z[1:l], p0)
         f(x, a = fit.param[1], b = fit.param[2]) = a*x^(b/2)
 
-        plot!(p, x, z, markershape = :circle, legend=(:topleft), color = "red", label = "epmpirical data", xaxis = (:log))
-        #plot!(p, ylims = (0., 2.5))
-        plot!(p, x, [f(i) for i in x], linewidth = 2, style = :dot, color = "black", label = "fit with α = $(round(fit.param[2], digits=2))")
+        plot!(p, x, z, markershape = :circle, legend=(:topleft), color = "red", label = "epmpirical data")
+        plot!(p, x, [f(i) for i in x], linewidth = 2., style = :dash, color = "black", label = "fit with α = $(round(fit.param[2], digits=2))")
 
-        vline!([(x[l] + x[l+1])/2], style = :dot, linewidth = 2., color = "green", label = "model limit")
+        vline!([(x[l] + x[l+1])/2], style = :dot, linewidth = 2.5, color = "blue", label = "model limit")
 
         ylabel!(L"$\eta(H)$")
 
@@ -160,31 +158,30 @@ function plot_betas(file::String, l::Int)
 
     Z = D["estimated_betas"]
 
+
     try
         x = D["annealing_times"]
+        plot!(p, x, Z, legend=:topleft, marker = (:dot, :red),  color = "red" , label = "empirical data")
         plot!(ylims = (0, .8))
         plot!(p, x, Z, label = false, color = "red")
         plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
     catch
         x = D["betas"]
-        #plot!(p, x, x, style = :dot, linewidth = 2., color = "black", label = "1 to 1"
-        vline!([(x[l]+x[l+1])/2], style = :dot, linewidth = 2., color = "green", label = "model limit")
-         βl = ((x[l] + x[l+1])/2)
-         println("model limit = ", βl)
+        plot!(p, x, Z, legend=:topleft, marker = (:dot, :red),  color = "red" , label = "empirical data")
 
+        βl = ((x[l] + x[l+1])/2)
+        println("model limit = ", βl)
         @. model(x, p) = p[1]+p[2]*x
         p0 = [0.5, 0.5]
 
         fit = curve_fit(model, x[1:l], Z[1:l], p0)
         err = stderror(fit)
         f(x, a = fit.param[1], b = fit.param[2]) = a+x*b
-
-
         label = "slope= $(round(fit.param[2], digits = 1))±$(round(err[2],  digits = 1))"
+        plot!(p, x, [f(i) for i in x], linewidth = 2., style = :dash, color = "black", label = label)
 
-        plot!(p, x, [f(i) for i in x], linewidth = 2, style = :dot, color = "blue", label = label)
-        plot!(p, x, Z, legend=:topleft, color = "red", label = L"\beta")
-        plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
+        vline!([βl], style = :dot, linewidth = 2.5, color = "blue", label = "model limit")
+
     end
 
 
@@ -210,18 +207,29 @@ function plot_p_values(file::String, l::Int)
     p = plot(size = (400, 250))
     p1 = twinx()
     α = D["alpha"]
+    plot!(p, xaxis = (:log))
 
     x = 0.
     try
         x = D["annealing_times"]
         xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
+        plot!(p, ylims = (-0.01, 1.05*li))
+        plot!(p1, ylims = (-0.01, 1.01))
 
-        plot!(p, legend=(0.15, 0.5), ylims = (-0.01, 1.05*li))
-        plot!(p1, ylims = (-0.01, 1.01), legend=(0.7, 0.55))
+        if occursin("case1", file)
+            plot!(p, legend=(0.12, 0.75))
+            plot!(p1, legend=(0.13, 0.41))
+        elseif occursin("short", file)
+            plot!(p, legend=(0.32, 0.08))
+            plot!(p1, legend=(0.36, 0.74))
+        elseif occursin("case7", file)
+            plot!(p, legend=(0.15, 0.76))
+            plot!(p1, legend=(0.68, 0.25))
+        end
+
 
     catch
         x = D["betas"]
-        plot!(p, xaxis = (:log))
         vline!([(x[l]+x[l+1])/2], style = :dot, linewidth = 2., color = "green", label = "model limit")
 
         plot!(p, legend=(0.4, 0.6), ylims = (-0.01, 1.05*li))
