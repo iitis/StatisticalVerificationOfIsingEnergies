@@ -66,8 +66,8 @@ function plot_bootstrad_std(file::String, l::Int)
         α = D["alpha"]
 
 
-        plot!(p, x, y, label = "std. from bootsrapping", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
-        plot!(p, x, y1, label = "computed by Eq (16)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
+        plot!(p, x, y, label = "bootsrap std"*L"_{j \in S} \left(E_0^{(j)}\right)", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
+        plot!(p, x, y1, label = "Eq (16)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
 
         ylabel!(L" \delta E_0")
 
@@ -101,8 +101,8 @@ function plot_bootstrad_mean(file::String, l::Int)
         α = D["alpha"]
 
 
-        plot!(p, x, y, label = "mean from bootsrapping", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
-        plot!(p, x, y1, label = "computed by Eq (9)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
+        plot!(p, x, y, label = "bootsrap mean"*L"_{j \in S} \left(E_0^{(j)}\right)", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
+        plot!(p, x, y1, label = "directly by Eq (9)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
 
         ylabel!(L"E_0")
 
