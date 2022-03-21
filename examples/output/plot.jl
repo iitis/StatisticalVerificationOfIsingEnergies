@@ -16,12 +16,17 @@ function plot_minimal_energies(file::String)
 
         x = 0.
         try
-            x = D["annealing_times"]
-            xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
+            x = D["system_size"]
+            xlabel!("system size")
         catch
-            x = D["betas"]
-            xlabel!(L"$\beta_{MH}$")
-            plot!(xscale = (:log))
+            try
+                x = D["annealing_times"]
+                xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
+            catch
+                x = D["betas"]
+                xlabel!(L"$\beta_{MH}$")
+                plot!(xscale = (:log))
+            end
         end
 
         y =  [D["ground"] for _ in 1:length(x)]
@@ -53,13 +58,18 @@ function plot_bootstrad_std(file::String, l::Int)
         y1 = D["squared_error"]
 
         try
-            x = D["annealing_times"]
-            xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
+            x = D["system_size"]
+            xlabel!("system size")
         catch
-            x = D["betas"]
-            xlabel!(L"$ \beta_{MH} $")
-            plot!(p, xaxis = (:log))
+            try
+                x = D["annealing_times"]
+                xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
+            catch
+                x = D["betas"]
+                xlabel!(L"$ \beta_{MH} $")
+                plot!(p, xaxis = (:log))
 
+            end
         end
 
 
@@ -89,12 +99,17 @@ function plot_bootstrad_mean(file::String, l::Int)
         y1 = D["minimum_estimated"]
 
         try
-            x = D["annealing_times"]
-            xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
+            x = D["system_size"]
+            xlabel!("system size")
         catch
-            x = D["betas"]
-            xlabel!(L"$ \beta_{MH} $")
-            plot!(p, xaxis = (:log))
+            try
+                x = D["annealing_times"]
+                xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
+            catch
+                x = D["betas"]
+                xlabel!(L"$ \beta_{MH} $")
+                plot!(p, xaxis = (:log))
+            end
         end
 
 
@@ -158,38 +173,50 @@ function plot_betas(file::String, l::Int)
 
     Z = D["estimated_betas"]
 
-
     try
-        x = D["annealing_times"]
-        plot!(p, x, Z, legend=:topleft, marker = (:dot, :red),  color = "red" , label = "empirical data")
+        x = D["system_size"]
         plot!(ylims = (0, .8))
         plot!(p, x, Z, label = false, color = "red")
         plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
     catch
-        x = D["betas"]
-        plot!(p, x, Z, legend=:topleft, marker = (:dot, :red),  color = "red" , label = "empirical data")
 
-        βl = ((x[l] + x[l+1])/2)
-        println("model limit = ", βl)
-        @. model(x, p) = p[1]+p[2]*x
-        p0 = [0.5, 0.5]
 
-        fit = curve_fit(model, x[1:l], Z[1:l], p0)
-        err = stderror(fit)
-        f(x, a = fit.param[1], b = fit.param[2]) = a+x*b
-        label = "slope= $(round(fit.param[2], digits = 1))±$(round(err[2],  digits = 1))"
-        plot!(p, x, [f(i) for i in x], linewidth = 2., style = :dash, color = "blue", label = label)
+        try
+            x = D["annealing_times"]
+            plot!(p, x, Z, legend=:topleft, marker = (:dot, :red),  color = "red" , label = "empirical data")
+            plot!(ylims = (0, .8))
+            plot!(p, x, Z, label = false, color = "red")
+            plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
+        catch
+            x = D["betas"]
+            plot!(p, x, Z, legend=:topleft, marker = (:dot, :red),  color = "red" , label = "empirical data")
 
-        vline!([βl], style = :dot, linewidth = 3., color = "black", label = "model limit")
+            βl = ((x[l] + x[l+1])/2)
+            println("model limit = ", βl)
+            @. model(x, p) = p[1]+p[2]*x
+            p0 = [0.5, 0.5]
 
+            fit = curve_fit(model, x[1:l], Z[1:l], p0)
+            err = stderror(fit)
+            f(x, a = fit.param[1], b = fit.param[2]) = a+x*b
+            label = "slope= $(round(fit.param[2], digits = 1))±$(round(err[2],  digits = 1))"
+            plot!(p, x, [f(i) for i in x], linewidth = 2., style = :dash, color = "blue", label = label)
+
+            vline!([βl], style = :dot, linewidth = 3., color = "black", label = "model limit")
+
+        end
     end
 
-
     try
-        x = D["annealing_times"]
-        xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
+        x = D["system_size"]
+        xlabel!("system size")
     catch
-        xlabel!(L"\beta_{MH}")
+        try
+            x = D["annealing_times"]
+            xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
+        catch
+            xlabel!(L"\beta_{MH}")
+        end
     end
     ylabel!(L"\beta \  \textrm{ estimated}")
 
@@ -202,37 +229,52 @@ end
 function plot_p_values(file::String, l::Int)
 
     D = npzread(file)
-    ZZ = ( D["minimum_from_data"] .- D["ground"])/abs(D["ground"])
+    ZZ = 0.
+    try
+        ZZ = ( D["minimum_from_data"] .- D["ground"])/abs(D["ground"])
+    catch
+        ZZ = ( D["minimum_from_data"] .- D["ground"])./abs.(D["ground"])
+    end
     li = maximum(ZZ)
     α = D["alpha"]
     p = plot(size = (400, 250))
     p1 = twinx()
-    plot!(p, xaxis = (:log))
+
 
     x = 0.
+
     try
-        x = D["annealing_times"]
-        xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
-        plot!(p, ylims = (-0.01, 1.05*li))
-        plot!(p1, ylims = (-0.01, 1.01))
-
-        if occursin("case1", file)
-            plot!(p, legend=(0.12, 0.75))
-            plot!(p1, legend=(0.13, 0.41))
-        elseif occursin("short", file)
-            plot!(p, legend=(0.32, 0.08))
-            plot!(p1, legend=(0.36, 0.74))
-        elseif occursin("case7", file)
-            plot!(p, legend=(0.15, 0.76))
-            plot!(p1, legend=(0.68, 0.25))
-        end
-
+        x = D["system_size"]
+        xlabel!("system size")
+        plot!(p, legend=(0.12, 0.5))
+        plot!(p1, legend=(0.5, 0.95))
     catch
-        x = D["betas"]
-        plot!(p, ylims = (-0.01, 1.05*li), legend=(0.15, 0.25))
-        plot!(p1, ylims = (-0.01, 1.01), legend=(0.45, 0.95))
+        plot!(p, xaxis = (:log))
 
-        xlabel!(L"$\beta_{MH}$")
+        try
+            x = D["annealing_times"]
+            xlabel!(L"\textrm{annealing} \ \textrm{time} \ \mu s")
+            plot!(p, ylims = (-0.01, 1.05*li))
+            plot!(p1, ylims = (-0.01, 1.01))
+
+            if occursin("case1", file)
+                plot!(p, legend=(0.12, 0.75))
+                plot!(p1, legend=(0.13, 0.41))
+            elseif occursin("short", file)
+                plot!(p, legend=(0.32, 0.08))
+                plot!(p1, legend=(0.36, 0.74))
+            elseif occursin("case7", file)
+                plot!(p, legend=(0.15, 0.76))
+                plot!(p1, legend=(0.68, 0.25))
+            end
+
+        catch
+            x = D["betas"]
+            plot!(p, ylims = (-0.01, 1.05*li), legend=(0.15, 0.25))
+            plot!(p1, ylims = (-0.01, 1.01), legend=(0.45, 0.95))
+
+            xlabel!(L"$\beta_{MH}$")
+        end
     end
 
     lab = L"$\Delta H $"
@@ -247,10 +289,16 @@ function plot_p_values(file::String, l::Int)
     Z2 = D["p_values_39"]
     plot!(p1, x, Z2, markershape = :star, label = "p-val. α=0.39", color = "brown")
 
+
     try
-        x = D["annealing_times"]
+        x = D["system_size"]
     catch
-        vline!(p1, [(x[l]+x[l+1])/2], style = :dot, linewidth = 3., color = "black", label = "model limit")
+
+        try
+            x = D["annealing_times"]
+        catch
+            vline!(p1, [(x[l]+x[l+1])/2], style = :dot, linewidth = 3., color = "black", label = "model limit")
+        end
     end
 
     str = "_p_values"

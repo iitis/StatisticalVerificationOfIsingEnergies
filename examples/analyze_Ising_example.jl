@@ -11,6 +11,7 @@ import StatisticalVerificationOfIsingEnergies: bootstrap_hists_of_mins, squared_
 function estimate_min(file::String)
 
     D = npzread(file)
+    push!(D, "a" => 0)
     α = 0.19
 
     ens = D["energies01"]
@@ -34,7 +35,12 @@ function estimate_min(file::String)
 
     e_min = D["ground"]
 
-    betas = [estiamte_temperature(ens[:,i], e_min) for i in 1:l]
+    betas = 0.
+    try
+        betas = [estiamte_temperature(ens[:,i], e_min) for i in 1:l]
+    catch
+        betas = [estiamte_temperature(ens[:,i], e_min[i]) for i in 1:l]
+    end
 
     push!(D, "eta" => eta)
     push!(D, "alpha" => α)
