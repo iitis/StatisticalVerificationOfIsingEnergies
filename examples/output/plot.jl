@@ -17,7 +17,7 @@ function plot_minimal_energies(file::String)
         x = 0.
         try
             x = D["system_size"]
-            xlabel!("system size")
+            xlabel!("problem size")
         catch
             try
                 x = D["annealing_times"]
@@ -59,7 +59,7 @@ function plot_bootstrad_std(file::String, l::Int)
 
         try
             x = D["system_size"]
-            xlabel!("system size")
+            xlabel!("problem size")
         catch
             try
                 x = D["annealing_times"]
@@ -100,7 +100,7 @@ function plot_bootstrad_mean(file::String, l::Int)
 
         try
             x = D["system_size"]
-            xlabel!("system size")
+            xlabel!("problem size")
         catch
             try
                 x = D["annealing_times"]
@@ -209,7 +209,7 @@ function plot_betas(file::String, l::Int)
 
     try
         x = D["system_size"]
-        xlabel!("system size")
+        xlabel!("problem size")
     catch
         try
             x = D["annealing_times"]
@@ -245,7 +245,7 @@ function plot_p_values(file::String, l::Int)
 
     try
         x = D["system_size"]
-        xlabel!("system size")
+        xlabel!("problem size")
         plot!(p, legend=(0.12, 0.5))
         plot!(p1, legend=(0.5, 0.95))
     catch
