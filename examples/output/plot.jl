@@ -77,7 +77,7 @@ function plot_bootstrad_std(file::String, l::Int)
 
 
         plot!(p, x, y, label = "bootsrap std"*L"_{j \in S} \left(E_0^{(j)}\right)", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
-        plot!(p, x, y1, label = "Eq (16)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
+        plot!(p, x, y1, label = "Eq. (17)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
 
         ylabel!(L" \delta E_0")
 
@@ -117,7 +117,7 @@ function plot_bootstrad_mean(file::String, l::Int)
 
 
         plot!(p, x, y, label = "bootsrap mean"*L"_{j \in S} \left(E_0^{(j)}\right)", line = (:green, 1.5), marker = (:dot, :green), legend=(:topright))
-        plot!(p, x, y1, label = "directly by Eq (9)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
+        plot!(p, x, y1, label = "directly by Eq. (10)", line = (:red, 1.5), marker = (:dot, :red) , legend=(:topright))
 
         ylabel!(L"E_0")
 
@@ -247,7 +247,7 @@ function plot_p_values(file::String, l::Int)
         x = D["system_size"]
         xlabel!("problem size")
         plot!(p, legend=(0.12, 0.5))
-        plot!(p1, legend=(0.5, 0.95))
+        plot!(p1, legend=(0.2, 0.95))
     catch
         plot!(p, xaxis = (:log))
 
@@ -265,7 +265,7 @@ function plot_p_values(file::String, l::Int)
                 plot!(p1, legend=(0.36, 0.74))
             elseif occursin("case7", file)
                 plot!(p, legend=(0.15, 0.76))
-                plot!(p1, legend=(0.68, 0.25))
+                plot!(p1, legend=(0.48, 0.14))
             end
 
         catch
@@ -280,14 +280,18 @@ function plot_p_values(file::String, l::Int)
     lab = L"$\Delta H $"
     plot!(p, x, ZZ, markershape = :square, linewidth = 2, markersise = 10., color = "blue", label = lab, ylabel = lab, right_margin=12mm)
 
-    Z1 = D["p_values_10"]
-    plot!(p1, x, Z1, markershape = :circ, label = "p-val. α=0.10", color = "orange", ylabel = "p - value", right_margin=12mm)
-
     Z = D["p_values"]
-    plot!(p1, x, Z, markershape = :diamond, label = "p-val. α=$α", color = "red")
-
+    Z1 = D["p_values_10"]
     Z2 = D["p_values_39"]
-    plot!(p1, x, Z2, markershape = :star, label = "p-val. α=0.39", color = "brown")
+
+    if isapprox(Z,Z1, atol = 1e-5) * isapprox(Z,Z2, atol = 1e-5)
+
+        plot!(p1, x, Z, markershape = :diamond, label = "p-val. α=0.1, $α, 0.39", ylabel = "p - value", color = "red")
+    else
+        plot!(p1, x, Z1, markershape = :circ, label = "p-val. α=0.10", color = "orange", ylabel = "p - value", right_margin=12mm)
+        plot!(p1, x, Z, markershape = :diamond, label = "p-val. α=$α", color = "red")
+        plot!(p1, x, Z2, markershape = :star, label = "p-val. α=0.39", color = "brown")
+    end
 
 
     try
