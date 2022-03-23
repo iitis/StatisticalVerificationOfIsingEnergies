@@ -175,7 +175,7 @@ function plot_betas(file::String, l::Int)
 
     try
         x = D["system_size"]
-        plot!(ylims = (0, .8))
+
         plot!(p, x, Z, label = false, color = "red")
         plot!(p, x, Z, label = false, marker = (:dot, :red),  color = "red")
     catch
@@ -246,7 +246,7 @@ function plot_p_values(file::String, l::Int)
     try
         x = D["system_size"]
         xlabel!("problem size")
-        plot!(p, legend=(0.12, 0.5))
+        plot!(p, legend=(0.33, 0.5))
         plot!(p1, legend=(0.2, 0.95))
     catch
         plot!(p, xaxis = (:log))
