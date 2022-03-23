@@ -246,8 +246,8 @@ function plot_p_values(file::String, l::Int)
     try
         x = D["system_size"]
         xlabel!("problem size")
-        plot!(p, legend=(0.33, 0.5))
-        plot!(p1, legend=(0.2, 0.95))
+        plot!(p, legend=(0.12, 0.15))
+        plot!(p1, legend=(0.55, 0.25))
     catch
         plot!(p, xaxis = (:log))
 
