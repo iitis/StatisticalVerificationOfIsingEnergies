@@ -95,6 +95,6 @@ julia> estiamte_temperature(x, -5.)
 
 ## Citing this work
 
-Krzysztof Domino, Mátyás Koniorczyk, Zbigniew Puchała, "Statistical quality assessment of Ising-based annealer outputs", https://arxiv.org/abs/2112.03602
+Krzysztof Domino, Mátyás Koniorczyk, Zbigniew Puchała,  Domino, K., M. Koniorczyk, and Z. Puchała, "Statistical quality assessment of Ising-based annealer outputs", Quantum Information Processing, vol. 21, issue Article number: 288 (2022), 08/2022, https://link.springer.com/article/10.1007/s11128-022-03623-5
 
 This project was supported by the Foundation for Polish Science (FNP) under grant number TEAM NET POIR.04.04.00-00-17C1/18-00
